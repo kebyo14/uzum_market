@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+        <!-- Логотип -->
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{% static 'images/uzum_logo.png' %}" alt="Uzum Market" class="logo me-2">
+        </a>
+
+        <!-- Бургер -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Меню -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-3 mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="btn btn-light" href="#"><i class="bi bi-list"></i> Каталог</a>
+                </li>
+            </ul>
+
+            <form class="d-flex flex-grow-1 me-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Искать товары и категории" aria-label="Поиск">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item me-3"><a class="nav-link" href="#"><i class="bi bi-person"></i> Войти</a></li>
+                <li class="nav-item me-3"><a class="nav-link" href="#"><i class="bi bi-heart"></i> Избранное</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bag"></i> Корзина</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    {% include 'product_cards.html' %}
+    {% include 'footer.html' %}
+{% endblock %}

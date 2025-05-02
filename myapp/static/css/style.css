@@ -1,0 +1,17 @@
+.logo-text {
+    font-weight: bold;
+    color: purple;
+}
+.logo-icon {
+    background: yellow;
+    border-radius: 50%;
+    padding: 5px;
+    color: purple;
+    font-weight: bold;
+}
+.search-input {
+    width: 100%;
+}
+.logo{
+    width: 140px
+}
