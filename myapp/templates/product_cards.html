@@ -2,7 +2,7 @@
 <div class="container mt-4 mb-5 ">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
         {% for product in products %}
-            <div class="col">
+            <div class="col product-card">
                 <div class="card h-100 shadow-sm">
                     <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                     <div class="card-body">
