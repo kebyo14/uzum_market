@@ -29,10 +29,17 @@
                 </button>
             </form>
 
-            <ul class="navbar-nav mb-2 mb-lg-0">
-                <li class="nav-item me-3"><a class="nav-link" href="#"><i class="bi bi-person"></i> Войти</a></li>
+            <ul class="navbar-nav mb-2 mb-lg-0">          
+                <a class="nav-item me-3"><a class="nav-link" href="{% url 'login' %}"><i class="bi bi-person"></i> Войти</a>
                 <li class="nav-item me-3"><a class="nav-link" href="#"><i class="bi bi-heart"></i> Избранное</a></li>
                 <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bag"></i> Корзина</a></li>
+                <form action="{% url 'login' %}" method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    {% if messages %}
+                      {% for message in messages %}
+                        <p class="text-red-600 text-sm">{{ message }}</p>
+                      {% endfor %}
+                    {% endif %}
             </ul>
         </div>
     </div>
