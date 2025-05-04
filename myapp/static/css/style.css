@@ -28,3 +28,11 @@
     height: 750px;  /* Можно изменить на любое нужное значение */
     border-radius: 8px;
 }
+.card:hover {
+    transform: scale(1.03);
+    transition: transform 0.3s ease;
+}
+.card{
+    transition: 500ms ;
+}
+
