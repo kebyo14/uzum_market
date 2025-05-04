@@ -9,6 +9,9 @@
     color: purple;
     font-weight: bold;
 }
+.object-fit-cover {
+    object-fit: cover;
+  }
 .search-input {
     width: 100%;
 }
