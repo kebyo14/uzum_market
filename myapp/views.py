@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .models import Product
+from .models import Product, Order
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -45,3 +45,43 @@ def catalog(request):
     })
 
 
+def register_order(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if name and email and password:
+            if Order.objects.filter(email=email).exists():
+                return render(request, 'register.html', {'error': 'Этот email уже зарегистрирован'})
+
+            order = Order(Name=name, email=email, password=password)
+            order.save()
+
+            request.session['user_name'] = name
+            return redirect('home')  
+        else:
+            return render(request, 'register.html', {'error': 'Все поля должны быть заполнены'})
+
+    return render(request, 'register.html')
+
+
+
+def logout_view(request):
+    request.session.flush() 
+    return redirect('home')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            user = Order.objects.get(email=email, password=password)
+            request.session['user_name'] = user.Name  # сохраняем имя
+            return redirect('home')  # или куда нужно
+        except Order.DoesNotExist:
+            messages.error(request, 'Неверный логин или пароль')
+
+    return render(request, 'login.html')
