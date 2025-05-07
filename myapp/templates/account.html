@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Профиль пользователя</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Имя</label>
+            <input type="text" class="form-control" name="name" value="{{ user.Name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Почта</label>
+            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Новый пароль</label>
+            <div class="input-group">
+              <input 
+                type="password" 
+                class="form-control" 
+                name="password" 
+                id="passwordInput" 
+                value="{{ user.password }}" 
+              />
+              
+              <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">👁</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+          </div>
+          
+          <script>
+            function togglePassword() {
+              const input = document.getElementById("passwordInput");
+              input.type = input.type === "password" ? "text" : "password";
+            }
+          </script>
+          </div>
+          
+    </form>
+</div>
+{% endblock %}
+account.html

@@ -85,3 +85,50 @@ def login_view(request):
             messages.error(request, 'Неверный логин или пароль')
 
     return render(request, 'login.html')
+
+
+def account_view(request):
+    if 'user_name' not in request.session:
+        return redirect('login')
+
+    user = Order.objects.filter(Name=request.session['user_name']).first()
+
+    if not user:
+        return redirect('login')
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if name and email:
+            user.Name = name
+            user.email = email
+            if password:
+                user.password = password  
+            user.save()
+            request.session['user_name'] = name
+            messages.success(request, 'Данные успешно обновлены')
+
+    return render(request, 'account.html', {'user': user})
+
+def login_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(username=name)
+        except User.DoesNotExist:
+            messages.error(request, 'Пользователь не найден')
+            return redirect('login')
+        
+        user = authenticate(request, username=name, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Неправильный пароль')
+            return redirect('login')
+
+    return render(request, 'login.html')

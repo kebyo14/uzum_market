@@ -8,4 +8,5 @@ urlpatterns = [
     path('catalog/', views.catalog, name='catalog'),  # <-- имя catalog
     path('register/', views.register_order, name='register'), # <-- регистрация
     path('logout/', views.logout_view, name='logout'), # <-- выход из аккаунта
+    path('account/', views.account_view, name='account'),
 ]
