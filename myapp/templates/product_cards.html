@@ -1,20 +1,21 @@
-<div class="container mt-4 mb-5 ">
+<div class="container mt-4 mb-5">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
-        {% for product in products %}
-            <div class="col product-card">
-                <div class="card h-100 shadow-sm">
-                    <a href="{% url 'product_info' product.pk %}" style="text-decoration: none; color: rgb(0, 0, 0);">
-                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                    <div class="card-body">
-                        <h6 class="card-title">{{ product.name }}</h6>
-                        <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
-                        <p class="fw-bold">{{ product.price }} сум</p>
-                    </div>
-                    </a>
-                </div>
-            </div>
-        {% empty %}
-            <p>Товары не найдены.</p>
-        {% endfor %}
+      {% for product in products %}
+        <div class="col product-card">
+          <div class="card h-100 shadow-sm custom-card">
+            <a href="{% url 'product_info' product.pk %}" class="text-decoration-none text-dark">
+              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+              <div class="card-body">
+                <h6 class="card-title">{{ product.name }}</h6>
+                <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                <p class="fw-bold">{{ product.price }} сум</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      {% empty %}
+        <p>Товары не найдены.</p>
+      {% endfor %}
     </div>
-</div>
+  </div>
+  

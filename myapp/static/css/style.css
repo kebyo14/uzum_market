@@ -28,3 +28,37 @@
     height: 750px;  /* Можно изменить на любое нужное значение */
     border-radius: 8px;
 }
+.custom-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-card img {
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .custom-card .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  
+  .custom-card .card-text {
+    font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .custom-card .fw-bold {
+    color: #000;
+    font-size: 15px;
+  }
+  
