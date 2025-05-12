@@ -132,3 +132,27 @@ def login_view(request):
             return redirect('login')
 
     return render(request, 'login.html')
+
+
+def favorites_view(request):
+    return render(request, 'favorites.html')
+
+
+from django.http import JsonResponse
+import json
+
+def get_products_by_ids(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ids = data.get('ids', [])
+        products = Product.objects.filter(pk__in=ids)
+        result = [
+            {
+                'id': p.pk,
+                'name': p.name,
+                'description': p.description[:50] + '...',
+                'price': p.price,
+                'image': p.image.url
+            } for p in products
+        ]
+        return JsonResponse({'products': result})

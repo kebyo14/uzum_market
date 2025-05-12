@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4 mb-5">
+    <h2 class="text-center mb-4 fw-bold">💖 Избранные товары</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4" id="favorites-container">
+        <!-- Карточки добавляются динамически -->
+    </div>
+
+    <div id="no-favorites" class="text-center text-muted mt-5" style="display: none;">
+        <h5>😢 У вас пока нет избранных товаров.</h5>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const favoriteIds = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const container = document.getElementById('favorites-container');
+        const noFav = document.getElementById('no-favorites');
+
+        if (favoriteIds.length === 0) {
+            noFav.style.display = 'block';
+            return;
+        }
+
+        fetch("{% url 'get_products_by_ids' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ ids: favoriteIds })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.products.length === 0) {
+                noFav.style.display = 'block';
+            } else {
+                noFav.style.display = 'none';
+                data.products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'col product-card';
+                    card.innerHTML = `
+                        <div class="card h-100 shadow-sm position-relative">
+                            <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 favorite-btn" data-id="${product.id}">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+
+                            <a href="/product/${product.id}/" style="text-decoration: none; color: rgb(0, 0, 0);">
+                                <img src="${product.image}" class="card-img-top" alt="${product.name}" style="height: 180px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h6 class="card-title">${product.name}</h6>
+                                    <p class="card-text text-muted small">${product.description}</p>
+                                    <p class="fw-bold text-primary">${product.price} сум</p>
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Активируем обработчики избранного
+                activateFavoriteButtons();
+            }
+        });
+
+        function activateFavoriteButtons() {
+            const buttons = document.querySelectorAll('.favorite-btn');
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+            buttons.forEach(btn => {
+                const productId = btn.getAttribute('data-id');
+                const icon = btn.querySelector('i');
+
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    if (favorites.includes(productId)) {
+                        favorites = favorites.filter(id => id !== productId);
+                        icon.classList.replace('bi-heart-fill', 'bi-heart');
+                        btn.closest('.col').remove();
+                    } else {
+                        favorites.push(productId);
+                        icon.classList.replace('bi-heart', 'bi-heart-fill');
+                    }
+
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+
+                    if (favorites.length === 0) {
+                        noFav.style.display = 'block';
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+{% endblock %}
