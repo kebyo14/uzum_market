@@ -2,6 +2,10 @@ from django.shortcuts import render,get_object_or_404,redirect
 from .models import Product,Comments,Contact2
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.shortcuts import render,get_object_or_404,redirect
+from .models import Product, Order
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 def home(request):
     products = Product.objects.all()
@@ -235,3 +239,80 @@ def delete_product_base(request, item_id):
         return redirect('product_base')
 
     return render(request, 'admin/index3.html', {'item': item})
+
+
+def logout_view(request):
+    request.session.flush() 
+    return redirect('home')
+
+
+def account_view(request):
+    if 'user_name' not in request.session:
+        return redirect('login')
+
+    user = Order.objects.filter(Name=request.session['user_name']).first()
+
+    if not user:
+        return redirect('login')
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if name and email:
+            user.Name = name
+            user.email = email
+            if password:
+                user.password = password  
+            user.save()
+            request.session['user_name'] = name
+            messages.success(request, 'Данные успешно обновлены')
+
+    return render(request, 'account.html', {'user': user})
+
+
+def favorites_view(request):
+    return render(request, 'favorites.html')
+
+
+from django.http import JsonResponse
+import json
+
+def get_products_by_ids(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        ids = data.get('ids', [])
+        products = Product.objects.filter(pk__in=ids)
+        result = [
+            {
+                'id': p.pk,
+                'name': p.name,
+                'description': p.description[:50] + '...',
+                'price': p.price,
+                'image': p.image.url
+            } for p in products
+        ]
+        return JsonResponse({'products': result})
+    
+
+def register_order(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if name and email and password:
+            if Order.objects.filter(email=email).exists():
+                return render(request, 'register.html', {'error': 'Этот email уже зарегистрирован'})
+
+            order = Order(Name=name, email=email, password=password)
+            order.save()
+
+            request.session['user_name'] = name
+            return redirect('home')  
+        else:
+            return render(request, 'register.html', {'error': 'Все поля должны быть заполнены'})
+
+    return render(request, 'register.html')    
+

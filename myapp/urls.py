@@ -5,8 +5,14 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('product/<int:pk>/',views.product_info,name='product_info'),
     path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'), # <-- выход из аккаунта
+    path('account/', views.account_view, name='account'),
+    path('favorites/', views.favorites_view, name='favorites'),
+    path('api/get-products/', views.get_products_by_ids, name='get_products_by_ids'),
+
     path('catalog/', views.catalog, name='catalog'),  # <-- имя catalog
     path('admin/',views.link_item,name='link_item'),
+    path('register/', views.register_order, name='register'),
     path('admin/index3.html', views.link, name='index3'),
     path('admin/pages/product_base',views.product_base,name='product_base'),
     path('admin/tables/index3.html', views.link, name='index3_tables'),

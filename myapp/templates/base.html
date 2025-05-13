@@ -67,7 +67,7 @@
                         <a class="nav-link" href="{% url 'favorites' %}">
                             <i class="bi bi-heart-fill"></i> Избранное
                         </a>
-                    </li>                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bag"></i> Корзина</a></li>
+                    </li>                   <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bag"></i> Корзина</a></li>
                     <form action="{% url 'login' %}" method="POST" class="space-y-6">
                         {% csrf_token %}
                         {% if messages %}

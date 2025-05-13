@@ -76,4 +76,12 @@ class Comments(models.Model):
     
     def __str__(self):
         return f"{self.name} - {'Прочитано' if self.is_read else 'Непрочитано'}"
-    
+
+
+class Order(models.Model):
+   Name = models.CharField(max_length=255, verbose_name="Имя")
+   email = models.EmailField(unique=True)
+   password = models.CharField(max_length=250)
+
+   def __str__(self):
+       return self.Name   
