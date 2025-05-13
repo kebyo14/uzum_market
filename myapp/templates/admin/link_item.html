@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <div class="left-container">
+        <div class="left-inner-container">
+          <h2>Let's Chat</h2>
+          <p>Whether you have a question, want to start a project, or simply want to connect.</p>
+          <br>
+          <p>Feel free to send me a message in the contact form</p>
+        </div>
+      </div>
+      <div class="right-container">
+        <div class="right-inner-container">
+          <h2 class="lg-view">Login</h2>
+          <h2 class="sm-view">Let's Chat</h2>
+          <a href="{% url 'create_item' %}">Create account</a>
+          <!-- {% for item in items %}
+          <a href="{% url 'update_item' item.id %}">Edit</a>
+          {% endfor %} -->
+          <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+          <form action="{% url 'link_item' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Name *" required />
+            <input type="password" name="password" placeholder="Password *" required />
+            <button type="submit">Enter</button>
+        </form>
+        
+        {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
+        
+      
+
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

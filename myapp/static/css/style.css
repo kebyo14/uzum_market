@@ -15,28 +15,6 @@
 .search-input {
     width: 100%;
 }
-.chat-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #0088cc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
-}
-.chat-icon:hover {
-    transform: scale(1.1);
-}
-.chat-icon img {
-    width: 32px;
-    height: 32px;
-}
 .logo{
     width: 140px
 }
@@ -50,11 +28,37 @@
     height: 750px;  /* Можно изменить на любое нужное значение */
     border-radius: 8px;
 }
-.card:hover {
-    transform: scale(1.03);
-    transition: transform 0.3s ease;
-}
-.card{
-    transition: 500ms ;
-}
-
+.custom-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-card img {
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .custom-card .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  
+  .custom-card .card-text {
+    font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .custom-card .fw-bold {
+    color: #000;
+    font-size: 15px;
+  }
+  

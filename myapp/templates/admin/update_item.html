@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Item</title>
+    <link rel="stylesheet" href="{% static 'css/entrance.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="left-container">
+                <div class="left-inner-container">
+                    <h2>Let's Chat</h2>
+                    <p>Whether you have a question, want to start a project, or simply want to connect.</p>
+                    <br>
+                    <p>Feel free to send me a message in the contact form.</p>
+                </div>
+            </div>
+            <div class="right-container">
+                <div class="right-inner-container">
+                    <form action="{% url 'update_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <h2 class="lg-view">Create Item</h2>
+                        <h2 class="sm-view">Let's Create</h2>
+                        <p>* Required</p>
+                        <div class="social-container">
+                            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                        <input type="text" name="name" placeholder="Name *" value="{{ item.name }}" required />
+                        <input type="text" name="email" placeholder="Email *" value="{{ item.email }}" required />                       
+                        <input type="password" name="password" placeholder="Password *" value="{{ request.POST.password }}" required />
+                        <input type="password" name="password" placeholder="Confirm Password *" value="{{ request.POST.password }}" required />
+                        <input type="file" name="img" placeholder="Image *" value="{{ request.POST.img }}" required />
+                        <button type="submit">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+    
+    
+</body>
+</html>

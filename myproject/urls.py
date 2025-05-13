@@ -3,10 +3,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.urls import re_path
-
+from myapp import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', views.link_item, name='link_item'), 
     path('', include('myapp.urls')),
 ]
 
