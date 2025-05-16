@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .models import Product,Comments,Contact2
+from .models import Product,Comments,Contact2,Category
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.shortcuts import render,get_object_or_404,redirect
@@ -150,8 +150,6 @@ def link(request):
     return render(request, 'admin/index3.html',{'user_name':user_name,'comments':comments,'comments': comments,
         'comments_unread_count': unread_count,'user_img': user_img})
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Comments, Category  # Предположим, категории в модели Category
 
 def product_base(request):
     comments = Comments.objects.all().order_by('-created_at')
@@ -173,31 +171,43 @@ def create_product_base(request):
     unread_count = Comments.objects.filter(is_read=False).count()
     user_img = request.session.get('user_img')
     user_name = request.session.get('user_name')
+    categories = Category.objects.all()
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        price = request.POST.get('price')
-        image = request.FILES.get('image')  # Файлы должны извлекаться через FILES
-        category_id = request.POST.get('category')
+        form_type = request.POST.get('form_type')  # ✅ правильное имя
 
-        if all([name, description, price, image, category_id]):
-            category = get_object_or_404(Category, id=category_id)
-            Product.objects.create(
-                name=name,
-                description=description,
-                price=price,
-                image=image,
-                category=category
-            )
-            return redirect('index3')
+        if form_type == 'new_category':
+            new_category_name = request.POST.get('new_category_name')
+            if new_category_name:
+                Category.objects.create(name=new_category_name)
+            return redirect('create_product_base')
+
+        elif form_type == 'new_product':
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            price = request.POST.get('price')
+            image = request.FILES.get('image')
+            category_id = request.POST.get('category')
+
+            if all([name, description, price, image, category_id]):
+                category = get_object_or_404(Category, id=category_id)
+                Product.objects.create(
+                    name=name,
+                    description=description,
+                    price=price,
+                    image=image,
+                    category=category
+                )
+                return redirect('index3')
 
     return render(request, 'admin/pages/tables/create_product_base.html', {
         'user_name': user_name,
         'user_img': user_img,
         'comments': comments,
         'comments_unread_count': unread_count,
+        'categories': categories
     })
+
 
 def update_product_base(request, item_id):
     comments = Comments.objects.all().order_by('-created_at')
@@ -220,7 +230,8 @@ def update_product_base(request, item_id):
             item.category = get_object_or_404(Category, id=category_id)
 
         item.save()
-        return redirect('index3')
+        return redirect('product_base')
+
 
     return render(request, 'admin/pages/tables/update_product_base.html', {
         'item': item,
