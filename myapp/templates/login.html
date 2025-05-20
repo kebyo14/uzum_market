@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Code by: www.codeinfoweb.com -->
+   
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login for Administration</title>
-    <!-- Tailwind CSS CDN -->
+   
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- GSAP CDN -->
+    
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
       defer
@@ -29,7 +29,7 @@
   <body class="flex items-center justify-center min-h-screen bg-gray-50">
     <div id="login-form" class="w-full max-w-md">
       <div class="bg-white shadow-xl rounded-xl p-10">
-        <!-- Title -->
+       
         <h2
           id="form-title"
           class="text-3xl uppercase font-bold text-center mb-8 text-gray-800"
@@ -38,7 +38,7 @@
         </h2>
         <form action="{% url 'home' %}" method="POST" class="space-y-6">
           {% csrf_token %}
-          <!-- Email Input -->
+          
           <div id="email-input">
             <label for="email" class="block text-sm text-gray-600 mb-2">Email</label>
             <input
@@ -51,7 +51,7 @@
             />
           </div>
         
-          <!-- Password Input -->
+          
           <div id="password-input">
             <label for="password" class="block text-sm text-gray-600 mb-2">Password</label>
             <input
@@ -64,7 +64,7 @@
             />
           </div>
         
-          <!-- Remember me and Create Account -->
+          
           <div class="flex justify-between items-center">
             <label class="flex items-center text-sm text-gray-600" id="remember-me">
               <input
@@ -80,7 +80,7 @@
             >Create account</a>
           </div>
         
-          <!-- Sign In Button -->
+        
           <div id="sign-in-button">
             <button
               type="submit"

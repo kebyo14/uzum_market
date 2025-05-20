@@ -32,7 +32,7 @@
         <form method="POST" action="{% url 'register' %}" class="space-y-6">
           {% csrf_token %}
           
-          <!-- Name -->
+         
           <div>
             <label for="name" class="block text-sm text-gray-600 mb-2">Name</label>
             <input
@@ -45,7 +45,7 @@
             />
           </div>
 
-          <!-- Email -->
+          
           <div>
             <label for="email" class="block text-sm text-gray-600 mb-2">Email</label>
             <input
@@ -58,7 +58,7 @@
             />
           </div>
 
-          <!-- Password -->
+         
           <div>
             <label for="password" class="block text-sm text-gray-600 mb-2">Password</label>
             <input
@@ -71,12 +71,12 @@
             />
           </div>
 
-          <!-- Display Error Message -->
+          
           {% if error %}
             <p class="text-red-600 text-center">{{ error }}</p>
           {% endif %}
 
-          <!-- Already have account -->
+         
           <div class="flex justify-between items-center">
             <label class="flex items-center text-sm text-gray-600">
               <input type="checkbox" class="form-checkbox h-4 w-4 text-teal-600" />
@@ -89,7 +89,7 @@
             >
           </div>
 
-          <!-- Submit -->
+          
           <div>
             <button
               type="submit"
