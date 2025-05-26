@@ -1,11 +1,64 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .models import Product,Comments,Contact2,Category
+from .models import Product,Comments,Contact2,Category,Order,Login
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.shortcuts import render,get_object_or_404,redirect
-from .models import Product, Order
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.conf import settings
+
+import random
+
+
+def generate_code():
+    return str(random.randint(100000, 999999))
+
+
+def send_verification_email(email, code):
+    send_mail(
+        'Your Verification Code',
+        f'Your verification code is: {code}',
+        'anvarovpcaloxon14@gmail.com',  # Replace with your actual gmail
+        [email],
+        fail_silently=False,
+    )
+
+
+def register(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']  # получаем пароль
+        code = generate_code()
+
+        request.session['verification_email'] = email
+        request.session['verification_code'] = code
+        request.session['password'] = password  # сохраняем пароль
+
+        send_verification_email(email, code)
+        return redirect('verify')
+    return render(request, 'email_code.html')
+
+
+from .models import Login
+
+def verify(request):
+    if request.method == 'POST':
+        input_code = request.POST['code']
+        correct_code = request.session.get('verification_code')
+
+        if input_code == correct_code:
+            email = request.session.get('verification_email')
+            password = request.session.get('password')
+
+            # Сохраняем нового пользователя
+            Login.objects.create(email=email, password=password)
+
+            return render(request, 'success.html')
+        else:
+            return render(request, 'verify.html', {'error': '❌ Неверный код. Попробуйте снова.'})
+
+    return render(request, 'verify.html')
+
+
 
 def home(request):
     products = Product.objects.all()
@@ -19,22 +72,21 @@ def product_info(request, pk):
         'products': related_products,  # для product_cards.html
     })
 def login_view(request):
+    error_message = None
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user = authenticate(request, username=email, password=password)
+        user = Login.objects.filter(email=email, password=password).first()
 
-        if user is not None:
-            login(request, user)
-            return redirect('/admin') 
+        if user:
+            request.session['user_email'] = user.email
+            return redirect('home')  # перенаправляем на нужную страницу
         else:
-            messages.error(request, 'Неверный логин или пароль')
-    
-    return render(request, 'login.html')
+            error_message = '❌ Неверный email или пароль'
 
-from .models import Product, Category
-
+    return render(request, 'login.html', {'error_message': error_message})
 def catalog(request):
     category_id = request.GET.get('category')
     categories = Category.objects.all()
@@ -258,13 +310,13 @@ def logout_view(request):
 
 
 def account_view(request):
-    if 'user_name' not in request.session:
-        return redirect('login')
+    if 'user_email' not in request.session:
+        return redirect('login_view')
 
-    user = Order.objects.filter(Name=request.session['user_name']).first()
+    user = Login.objects.filter(email=request.session['user_email']).first()
 
     if not user:
-        return redirect('login')
+        return redirect('login_view')
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -272,7 +324,7 @@ def account_view(request):
         password = request.POST.get('password')
 
         if name and email:
-            user.Name = name
+            user.name = name
             user.email = email
             if password:
                 user.password = password  
@@ -314,10 +366,10 @@ def register_order(request):
         password = request.POST.get('password')
 
         if name and email and password:
-            if Order.objects.filter(email=email).exists():
+            if Login.objects.filter(email=email).exists():
                 return render(request, 'register.html', {'error': 'Этот email уже зарегистрирован'})
 
-            order = Order(Name=name, email=email, password=password)
+            order = Login(name=name, email=email, password=password)
             order.save()
 
             request.session['user_name'] = name

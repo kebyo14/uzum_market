@@ -68,13 +68,8 @@
                             <i class="bi bi-heart-fill"></i> Избранное
                         </a>
                     </li>                   <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bag"></i> Корзина</a></li>
-                    <form action="{% url 'login' %}" method="POST" class="space-y-6">
+                    <form action="{% url 'login_view' %}" method="POST" class="space-y-6">
                         {% csrf_token %}
-                        {% if messages %}
-                          {% for message in messages %}
-                            <p class="text-red-600 text-sm">{{ message }}</p>
-                          {% endfor %}
-                        {% endif %}
                     </form>  <!-- ← закрытия не было! -->
                 </ul>
             </div>

@@ -79,9 +79,17 @@ class Comments(models.Model):
 
 
 class Order(models.Model):
-   Name = models.CharField(max_length=255, verbose_name="Имя")
+   name = models.CharField(max_length=255, verbose_name="Имя")
    email = models.EmailField(unique=True)
    password = models.CharField(max_length=250)
 
    def __str__(self):
-       return self.Name   
+       return self.name   
+   
+
+class Login(models.Model):
+    name = models.CharField(max_length=100,null=False,blank=False)
+    email = models.EmailField(max_length=255,null=False,blank=False)
+    password = models.CharField(max_length=100,null=False, blank=False)
+    def __str__(self):
+        return self.name

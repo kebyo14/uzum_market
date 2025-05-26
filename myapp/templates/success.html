@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Успешно подтверждено</title>
+    <link rel="stylesheet" href="{% static 'css/success.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: green;">✅ Email успешно подтверждён!</h1>
+        <a href="{% url 'login_view' %}">
+            <button style="margin-top: 20px;">Назад</button>
+        </a>
+    </div>
+</body>
+</html>

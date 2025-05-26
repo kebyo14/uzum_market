@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Подтверждение Email</title>
+    <link rel="stylesheet" href="{% static 'css/verify.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Подтверждение Email</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="code">Введите код из письма:</label>
+            <input type="text" id="code" name="code" placeholder="123456" required />
+            <button type="submit">Подтвердить</button>
+        </form>
+        <a class="back-link" href="{% url 'register' %}">← Назад к регистрации</a>
+    </div>
+</body>
+</html>

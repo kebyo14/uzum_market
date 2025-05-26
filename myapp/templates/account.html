@@ -15,7 +15,7 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="name" class="form-label">Имя</label>
-            <input type="text" class="form-control" name="name" value="{{ user.Name }}" required>
+            <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Почта</label>
@@ -48,4 +48,3 @@
     </form>
 </div>
 {% endblock %}
-account.html

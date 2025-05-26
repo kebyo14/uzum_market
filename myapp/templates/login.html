@@ -1,97 +1,52 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Code by: www.codeinfoweb.com -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login for Administration</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- GSAP CDN -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
-      defer
-    ></script>
-
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap");
-
-      body {
-        background: linear-gradient(to right, #667eea, #764ba2);
-        font-family: "Space Grotesk", sans-serif;
-      }
-
-      input:focus {
-        outline: none;
-      }
-    </style>
-  </head>
-  <body class="flex items-center justify-center min-h-screen bg-gray-50">
-    <div id="login-form" class="w-full max-w-md">
-      <div class="bg-white shadow-xl rounded-xl p-10">
-        <!-- Title -->
-        <h2
-          id="form-title"
-          class="text-3xl uppercase font-bold text-center mb-8 text-gray-800"
-        >
-          Login
-        </h2>
-        <form action="{% url 'home' %}" method="POST" class="space-y-6">
-          {% csrf_token %}
-          <!-- Email Input -->
-          <div id="email-input">
-            <label for="email" class="block text-sm text-gray-600 mb-2">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm transition-all duration-300"
-              placeholder="Enter your email"
-            />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <div class="left-container">
+        <div class="left-inner-container">
+          <h2>Let's Chat</h2>
+          <p>Whether you have a question, want to start a project, or simply want to connect.</p>
+          <br>
+          <p>Feel free to send me a message in the contact form</p>
+        </div>
+      </div>
+      <div class="right-container">
+        <div class="right-inner-container">
+          <h2 class="lg-view">Login</h2>
+          <h2 class="sm-view">Let's Chat</h2>
+          <a href="{% url 'register' %}">Create account</a>
+          <!-- {% for item in items %}
+          <a href="{% url 'update_item' item.id %}">Edit</a>
+          {% endfor %} -->
+          <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
           </div>
-        
-          <!-- Password Input -->
-          <div id="password-input">
-            <label for="password" class="block text-sm text-gray-600 mb-2">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm transition-all duration-300"
-              placeholder="Enter your password"
-            />
-          </div>
-        
-          <!-- Remember me and Create Account -->
-          <div class="flex justify-between items-center">
-            <label class="flex items-center text-sm text-gray-600" id="remember-me">
-              <input
-                type="checkbox"
-                class="form-checkbox h-4 w-4 text-teal-600 border-gray-300 rounded transition duration-200"
-              />
-              <span class="ml-2">Remember me</span>
-            </label>
-            <a
-              href="{% url 'register' %}"
-              id="forgot-password"
-              class="text-sm text-teal-600 hover:underline"
-            >Create account</a>
-          </div>
-        
-          <!-- Sign In Button -->
-          <div id="sign-in-button">
-            <button
-              type="submit"
-              class="w-full py-3 bg-teal-600 text-white text-lg rounded-lg hover:bg-teal-700 transition duration-300 ease-in-out shadow-lg"
-            >
-              Sign In
-            </button>
-          </div>
+          <form action="{% url 'login_view' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="email" placeholder="Email *" required />
+            <input type="password" name="password" placeholder="Password *" required />
+            <button type="submit">Enter</button>
         </form>
         
+        {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
+        
+      
 
-    <script src="script.js"></script>
-  </body>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

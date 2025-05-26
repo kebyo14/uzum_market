@@ -1,10 +1,13 @@
 from django.urls import path
 from . import views
+from myapp import views
 
 urlpatterns = [
+    path('register/', views.register, name='register'),
+    path('verify/', views.verify, name='verify'),
     path('', views.home, name='home'),
     path('product/<int:pk>/',views.product_info,name='product_info'),
-    path('login/', views.login_view, name='login'),
+    path('login/', views.login_view, name='login_view'),
     path('logout/', views.logout_view, name='logout'), # <-- выход из аккаунта
     path('account/', views.account_view, name='account'),
     path('favorites/', views.favorites_view, name='favorites'),
