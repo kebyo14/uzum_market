@@ -31,20 +31,18 @@
                 id="passwordInput" 
                 value="{{ user.password }}" 
               />
-              
               <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">👁</button>
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-          </div>
-          
-          <script>
-            function togglePassword() {
-              const input = document.getElementById("passwordInput");
-              input.type = input.type === "password" ? "text" : "password";
-            }
-          </script>
-          </div>
-          
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-4">Сохранить изменения</button>
     </form>
 </div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById("passwordInput");
+    input.type = input.type === "password" ? "text" : "password";
+  }
+</script>
 {% endblock %}

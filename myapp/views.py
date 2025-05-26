@@ -66,10 +66,10 @@ def home(request):
 
 def product_info(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    related_products = Product.objects.exclude(pk=pk)[:5]  # Пример: другие товары
+    related_products = Product.objects.exclude(pk=pk)[:5]  
     return render(request, 'product_info.html', {
         'product': product,
-        'products': related_products,  # для product_cards.html
+        'products': related_products,  
     })
 def login_view(request):
     error_message = None
@@ -104,7 +104,7 @@ def catalog(request):
 def link(request):
     user_img = request.session.get('user_img', None)
     comments = Comments.objects.all().order_by('-created_at')
-    unread_count = Comments.objects.filter(is_read=False).count()  # Количество непрочитанных
+    unread_count = Comments.objects.filter(is_read=False).count()  
 
     comments = Comments.objects.all()
     user_name = request.session.get('user_name', None)
@@ -122,9 +122,9 @@ def link_item(request):
 
         if user:
             request.session['user_name'] = user.name
-            request.session['user_img'] = user.img.url if user.img else None  # Сохраняем изображение
+            request.session['user_img'] = user.img.url if user.img else None  
             request.session.save()
-            return redirect('index3')  # Перенаправление на index3.html
+            return redirect('index3')  
         else:
             error_message = "Неправильное имя или пароль"
 
@@ -141,7 +141,7 @@ def create_item(request):
 
         if password == confirm_password:
             Contact2.objects.create(name=name, email=email, password=password, img=img)
-            return redirect('link_item')  # Перенаправление на логин-страницу
+            return redirect('link_item')  
 
     return render(request, 'admin/create_item.html')
 
@@ -187,21 +187,23 @@ def comments_item(request):
         number = request.POST.get('number')
         email = request.POST.get('email')
         message = request.POST.get('message')
-        if name and number and email and message:  # Bo‘sh maydonlarni tekshirish
+        if name and number and email and message:  
             Comments.objects.create(name=name, number=number,email=email,message=message,is_read=False)
-            return redirect('home')  # URL nomini to‘g‘ri qo‘ying
+            return redirect('home')  
     return render(request,'comments.html')
 
 def link(request):
     user_img = request.session.get('user_img', None)
     comments = Comments.objects.all().order_by('-created_at')
-    unread_count = Comments.objects.filter(is_read=False).count()  # Количество непрочитанных
+    unread_count = Comments.objects.filter(is_read=False).count()  
 
     comments = Comments.objects.all()
     user_name = request.session.get('user_name', None)
     return render(request, 'admin/index3.html',{'user_name':user_name,'comments':comments,'comments': comments,
         'comments_unread_count': unread_count,'user_img': user_img})
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Product, Comments, Category  
 
 def product_base(request):
     comments = Comments.objects.all().order_by('-created_at')
