@@ -11,7 +11,7 @@
       <h2 class="fw-bold">{{ product.name }}</h2>
       <p class="text-muted">{{ product.description }}</p>
       <h4 class="fw-bold text-success">{{ product.price }} сум</h4>
-      <button class="btn btn-primary btn-lg mt-3">Добавить в корзину</button>
+      <button id="add-to-cart-btn" class="btn btn-primary btn-lg mt-3">Добавить в корзину</button>
     </div>
   </div>
 
@@ -20,4 +20,46 @@
   <h4 class="mb-4">Похожие товары</h4>
   {% include 'product_cards.html' %}
 </div>
-{% endblock %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', initCartButton);
+  window.addEventListener('pageshow', initCartButton); // ← фикс для кнопки при "назад"
+  
+  function initCartButton() {
+      const productId = '{{ product.id }}';
+      const btn = document.getElementById('add-to-cart-btn');
+  
+      if (!btn) return;
+  
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  
+      if (cart.includes(productId)) {
+          setButtonInCart(btn);
+      } else {
+          resetButton(btn);
+      }
+  
+      btn.addEventListener('click', function () {
+          if (!cart.includes(productId)) {
+              cart.push(productId);
+              localStorage.setItem('cart', JSON.stringify(cart));
+              setButtonInCart(btn);
+          }
+      });
+  }
+  
+  function setButtonInCart(btn) {
+      btn.textContent = '✅ В корзине';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-success');
+      btn.disabled = true;
+  }
+  
+  function resetButton(btn) {
+      btn.textContent = 'Добавить в корзину';
+      btn.classList.remove('btn-success');
+      btn.classList.add('btn-primary');
+      btn.disabled = false;
+  }
+  </script>
+{% endblock %}  

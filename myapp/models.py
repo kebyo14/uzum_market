@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+from .managers import CustomUserManager
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Категория")
@@ -50,7 +53,7 @@ class Product(models.Model):
     
     
 
-class CustomUser(models.Model):
+class Polzovatel(models.Model):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
 
@@ -78,18 +81,21 @@ class Comments(models.Model):
         return f"{self.name} - {'Прочитано' if self.is_read else 'Непрочитано'}"
 
 
-class Order(models.Model):
-   name = models.CharField(max_length=255, verbose_name="Имя")
-   email = models.EmailField(unique=True)
-   password = models.CharField(max_length=250)
 
-   def __str__(self):
-       return self.name   
-   
 
-class Login(models.Model):
-    name = models.CharField(max_length=100,null=False,blank=False)
-    email = models.EmailField(max_length=255,null=False,blank=False)
-    password = models.CharField(max_length=100,null=False, blank=False)
+class CustomUser(AbstractUser):
+    username = None
+    name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(_("email address"), unique=True, null=True, blank=True)
+    phone = models.CharField(max_length=20, unique=True, null=True, blank=True)  # добавлено
+    email_active = models.BooleanField(default=False)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    # Не трогаем groups и user_permissions — они будут взяты из AbstractUser
+
     def __str__(self):
-        return self.name
+        return self.email

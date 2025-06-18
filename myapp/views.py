@@ -1,13 +1,94 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .models import Product,Comments,Contact2,Category,Order,Login
-from django.contrib.auth import authenticate, login
+from .models import Product,Comments,Contact2,Category,CustomUser
+from django.contrib.auth import logout,authenticate, login
 from django.contrib import messages
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.conf import settings
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 import random
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.utils.timezone import now
+from utils.sms import send_sms_code  # импорт твоей функции отправки
+from django.core.cache import cache  # для проверки кода
 
+# 📤 Отправка SMS-кода
+def send_sms_view(request):
+    phone = request.GET.get("phone")
+    # Автоматически добавим "+" если пользователь не ввёл
+    if phone.startswith("998"):
+        phone = "+" + phone
+    elif not phone.startswith("+"):
+        return JsonResponse({"error": "Номер должен начинаться с +998"}, status=400)
+    try:
+        send_sms_code(phone)
+        return JsonResponse({"success": "Код отправлен"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+# ✅ Проверка кода
+def verify_sms_code(request):
+    phone = request.GET.get("phone")
+    code = request.GET.get("code")
+
+    if phone.startswith("998"):
+        phone = "+" + phone
+    cached_code = cache.get(f"sms_code:{phone}")
+    if cached_code == code:
+        return JsonResponse({"success": "Код подтвержден"})
+    else:
+        return JsonResponse({"error": "Неверный или просроченный код"}, status=400)
+
+def phone_sms(request):
+    phone = request.session.get('verification_phone')
+
+    if request.method == 'POST':
+        input_code = request.POST.get('code')
+        correct_code = cache.get(f'verify_code:{phone}')
+
+        if not correct_code:
+            return render(request, 'phone_sms.html', {
+                'error': '⏰ Срок действия кода истёк. Пожалуйста, зарегистрируйтесь снова.',
+                'code_expiry_timestamp': 0
+            })
+
+        if input_code == correct_code:
+            password = request.session.get('password')
+            name = request.session.get('name')
+
+            if CustomUser.objects.filter(phone=phone).exists():
+                return render(request, 'phone_sms.html', {
+                    'error': '❌ Пользователь с таким номером уже зарегистрирован.',
+                    'code_expiry_timestamp': 0
+                })
+
+            # создаём пользователя
+            user = CustomUser.objects.create_user(phone=phone, password=password, name=name)
+
+            # очищаем
+            cache.delete(f'verify_code:{phone}')
+            request.session.pop('verification_phone', None)
+            request.session.pop('password', None)
+            request.session.pop('name', None)
+
+            return render(request, 'success.html')
+
+        else:
+            ttl = cache.ttl(f'verify_code:{phone}') or 0
+            expiry_timestamp = int(now().timestamp() + ttl)
+            return render(request, 'phone_sms.html', {
+                'error': '❌ Неверный код. Попробуйте снова.',
+                'code_expiry_timestamp': expiry_timestamp
+            })
+
+    ttl = cache.ttl(f'verify_code:{phone}') or 0
+    expiry_timestamp = int(now().timestamp() + ttl)
+    return render(request, 'phone_sms.html', {
+        'code_expiry_timestamp': expiry_timestamp
+    })
 
 def generate_code():
     return str(random.randint(100000, 999999))
@@ -22,43 +103,108 @@ def send_verification_email(email, code):
         fail_silently=False,
     )
 
-
 def register(request):
     if request.method == 'POST':
-        email = request.POST['email']
+        method = request.POST.get('confirmation_method')  # 'email' или 'sms'
         password = request.POST['password']  # получаем пароль
-        code = generate_code()
+        name = request.POST.get('name')
 
-        request.session['verification_email'] = email
-        request.session['verification_code'] = code
-        request.session['password'] = password  # сохраняем пароль
+        if method == 'email':
+            email = request.POST['email']
+            if CustomUser.objects.filter(email=email).exists():
+                return render(request, 'register.html', {
+                    'error': '❌ Этот email уже используется.'
+                })
+            code = generate_code()
+            # Кешируем код с привязкой к email, на 2 минуты
+            cache.set(f'verify_code:{email}', code, timeout=120)
+            # Пароль и email всё ещё можно держать в сессии
+            request.session['verification_email'] = email
+            request.session['password'] = password
+            request.session['name'] = name
+            send_verification_email(email, code)
+            return redirect('verify')
 
-        send_verification_email(email, code)
-        return redirect('verify')
+        elif method == 'sms':
+            phone = request.POST['phone']
+            if phone.startswith("998"):
+                phone = "+" + phone
+            elif not phone.startswith("+"):
+                return render(request, 'register.html', {
+                    'error': 'Номер должен начинаться с +998'
+            })
+            if CustomUser.objects.filter(phone=phone).exists():
+                return render(request, 'register.html', {
+                    'error': '❌ Этот номер уже зарегистрирован.'
+                })
+            code = generate_code()
+            cache.set(f'verify_code:{phone}', code, timeout=120)
+            request.session['verification_phone'] = phone
+            request.session['password'] = password
+            request.session['name'] = name
+            send_sms_code(phone)
+            return redirect('phone_sms')  # этот шаблон оформим ниже
+
     return render(request, 'email_code.html')
-
-
-from .models import Login
 
 def verify(request):
     if request.method == 'POST':
-        input_code = request.POST['code']
-        correct_code = request.session.get('verification_code')
+        input_code = request.POST.get('code')
+        email = request.session.get('verification_email')
+        correct_code = cache.get(f'verify_code:{email}')
+
+        if not correct_code:
+            return render(request, 'verify.html', {
+                'error': '⏰ Срок действия кода истёк. Пожалуйста, зарегистрируйтесь снова.',
+                'code_expiry_timestamp': 0
+            })
 
         if input_code == correct_code:
-            email = request.session.get('verification_email')
             password = request.session.get('password')
 
-            # Сохраняем нового пользователя
-            Login.objects.create(email=email, password=password)
+            # Повторная проверка на наличие пользователя
+            if CustomUser.objects.filter(email=email).exists():
+                return render(request, 'verify.html', {
+                    'error': '❌ Пользователь с таким email уже зарегистрирован.',
+                    'code_expiry_timestamp': 0
+                })
+
+            # Создаём пользователя
+            user = CustomUser.objects.create_user(email=email, password=password)
+
+            # Удаляем код из кэша
+            cache.delete(f'verify_code:{email}')
+
+            # Очистка сессии при необходимости:
+            request.session.pop('verification_email', None)
+            request.session.pop('password', None)
 
             return render(request, 'success.html')
         else:
-            return render(request, 'verify.html', {'error': '❌ Неверный код. Попробуйте снова.'})
+            ttl = cache.ttl(f'verify_code:{email}') or 0
+            expiry_timestamp = int(now().timestamp() + ttl)
+            return render(request, 'verify.html', {
+                'error': '❌ Неверный код. Попробуйте снова.',
+                'code_expiry_timestamp': expiry_timestamp
+            })
 
-    return render(request, 'verify.html')
+    # GET-запрос — показать шаблон и таймер
+    email = request.session.get('verification_email')
+    ttl = cache.ttl(f'verify_code:{email}') or 0
+    expiry_timestamp = int(now().timestamp() + ttl)
+    return render(request, 'verify.html', {
+        'code_expiry_timestamp': expiry_timestamp
+    })
 
 
+def resend_sms_code(request):
+    phone = request.session.get('verification_phone')
+    if phone:
+        code = generate_code()
+        cache.set(f'verify_code:{phone}', code, timeout=120)
+        send_sms_code(phone)  # заменили на правильную функцию
+        messages.success(request, '✅ Код был отправлен повторно.')
+    return redirect('phone_sms')
 
 def home(request):
     products = Product.objects.all()
@@ -78,15 +224,14 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user = Login.objects.filter(email=email, password=password).first()
-
-        if user:
-            request.session['user_email'] = user.email
-            return redirect('home')  # перенаправляем на нужную страницу
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
         else:
             error_message = '❌ Неверный email или пароль'
 
-    return render(request, 'login.html', {'error_message': error_message})
+    return render(request, 'account/login.html', {'error_message': error_message})
 def catalog(request):
     category_id = request.GET.get('category')
     categories = Category.objects.all()
@@ -202,9 +347,6 @@ def link(request):
     return render(request, 'admin/index3.html',{'user_name':user_name,'comments':comments,'comments': comments,
         'comments_unread_count': unread_count,'user_img': user_img})
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Comments, Category  
-
 def product_base(request):
     comments = Comments.objects.all().order_by('-created_at')
     unread_count = Comments.objects.filter(is_read=False).count()
@@ -310,39 +452,35 @@ def logout_view(request):
     request.session.flush() 
     return redirect('home')
 
-
+@login_required
 def account_view(request):
-    if 'user_email' not in request.session:
-        return redirect('login_view')
-
-    user = Login.objects.filter(email=request.session['user_email']).first()
-
-    if not user:
-        return redirect('login_view')
-
+    user = request.user
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
         if name and email:
-            user.name = name
             user.email = email
+            user.first_name = name  # Или user.name, если есть поле
             if password:
-                user.password = password  
+                user.set_password(password)
             user.save()
-            request.session['user_name'] = name
             messages.success(request, 'Данные успешно обновлены')
 
     return render(request, 'account.html', {'user': user})
+
+def delete_account_view(request):
+    if request.user.is_authenticated:
+        request.user.delete()
+        logout(request)
+        messages.success(request, 'Аккаунт успешно удалён.')
+    return redirect('login_view')
 
 
 def favorites_view(request):
     return render(request, 'favorites.html')
 
-
-from django.http import JsonResponse
-import json
 
 def get_products_by_ids(request):
     if request.method == "POST":
@@ -368,10 +506,10 @@ def register_order(request):
         password = request.POST.get('password')
 
         if name and email and password:
-            if Login.objects.filter(email=email).exists():
+            if CustomUser.objects.filter(email=email).exists():
                 return render(request, 'register.html', {'error': 'Этот email уже зарегистрирован'})
 
-            order = Login(name=name, email=email, password=password)
+            order = CustomUser(name=name, email=email, password=password)
             order.save()
 
             request.session['user_name'] = name
@@ -381,3 +519,32 @@ def register_order(request):
 
     return render(request, 'register.html')    
 
+def korzina(request):
+    return render(request, 'korzina.html')
+
+@csrf_exempt
+def get_products_by_ids(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            ids = data.get('ids', [])
+            products = Product.objects.filter(id__in=ids)
+
+            product_list = []
+            for product in products:
+                product_list.append({
+                    'id': product.id,
+                    'name': product.name,
+                    'price': product.price,
+                    'description': product.description[:100],
+                    'image': product.image.url if product.image else '/static/img/no-image.png',
+                })
+
+            return JsonResponse({'products': product_list})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def checkout(request):
+    return render(request,'checkout.html')

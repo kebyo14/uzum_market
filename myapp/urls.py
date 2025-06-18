@@ -1,8 +1,14 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
 from myapp import views
 
 urlpatterns = [
+    path('accounts/', include('allauth.urls')), 
+
+    path("send-sms/", views.send_sms_view),
+    path("verify-sms/", views.verify_sms_code),
+    path("phone_sms/",views.phone_sms, name='phone_sms'),
+    path('resend_sms/', views.resend_sms_code, name='resend_sms_code'),
     path('register/', views.register, name='register'),
     path('verify/', views.verify, name='verify'),
     path('', views.home, name='home'),
@@ -10,8 +16,12 @@ urlpatterns = [
     path('login/', views.login_view, name='login_view'),
     path('logout/', views.logout_view, name='logout'), # <-- выход из аккаунта
     path('account/', views.account_view, name='account'),
+    path('korzina/', views.korzina, name='korzina'),
+    path('get-products/', views.get_products_by_ids, name='get_products_by_ids'),
+    path('checkout/', views.checkout, name='checkout'),
     path('favorites/', views.favorites_view, name='favorites'),
     path('api/get-products/', views.get_products_by_ids, name='get_products_by_ids'),
+    path('delete-account/', views.delete_account_view, name='delete_account'),
 
     path('catalog/', views.catalog, name='catalog'),  # <-- имя catalog
     path('admin/',views.link_item,name='link_item'),

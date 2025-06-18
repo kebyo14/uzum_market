@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Подтверждение по SMS</title>
+  <link rel="stylesheet" href="{% static 'css/verify.css' %}">
+  <style>
+    .error-message {
+      color: #b00020;
+      background-color: #fddede;
+      border: 1px solid #b00020;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .resend {
+      margin-top: 15px;
+    }
+    .timer {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .success-message {
+      color: #007e33;
+      background-color: #e6ffed;
+      border: 1px solid #00c851;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Подтверждение по SMS</h1>
+
+    {% if error %}
+      <div class="error-message">{{ error }}</div>
+    {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="success-message">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <label for="code">Введите код из SMS:</label>
+      <input type="text" id="code" name="code" placeholder="123456" required />
+      <button type="submit">Подтвердить</button>
+    </form>
+
+    <div class="resend">
+      <div id="timer" class="timer">Повторная отправка доступна через 2:00</div>
+      <form id="resend-form" method="POST" action="{% url 'resend_sms_code' %}" style="display: none;">
+        {% csrf_token %}
+        <button type="submit">Отправить код повторно</button>
+      </form>
+    </div>
+
+    <a class="back-link" href="{% url 'register' %}">← Назад к регистрации</a>
+  </div>
+
+  <script>
+    const expiryTimestamp = {{ code_expiry_timestamp|default:0 }};
+    const now = Math.floor(Date.now() / 1000);
+    let timeLeft = expiryTimestamp - now;
+
+    const timerDisplay = document.getElementById('timer');
+    const resendForm = document.getElementById('resend-form');
+
+    if (timeLeft <= 0) {
+      timerDisplay.style.display = 'none';
+      resendForm.style.display = 'block';
+    } else {
+      const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          timerDisplay.style.display = 'none';
+          resendForm.style.display = 'block';
+        } else {
+          let minutes = Math.floor(timeLeft / 60);
+          let seconds = timeLeft % 60;
+          timerDisplay.textContent = `Повторная отправка доступна через ${minutes}:${seconds.toString().padStart(2, '0')}`;
+          timeLeft--;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -31,8 +32,7 @@
 
         <form method="POST" action="{% url 'register' %}" class="space-y-6">
           {% csrf_token %}
-          
-          <!-- Name -->
+
           <div>
             <label for="name" class="block text-sm text-gray-600 mb-2">Name</label>
             <input
@@ -45,13 +45,11 @@
             />
           </div>
 
-          <!-- Email -->
           <div>
-            <label for="email" placeholder="email123@gmail.com" class="block text-sm text-gray-600 mb-2">Email</label>
+            <label for="email" class="block text-sm text-gray-600 mb-2">Email</label>
             <input
               type="email"
               id="email"
-              
               name="email"
               required
               class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm"
@@ -59,7 +57,17 @@
             />
           </div>
 
-          <!-- Password -->
+          <div>
+            <label for="phone" class="block text-sm text-gray-600 mb-2">Phone (для SMS)</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm"
+              placeholder="+998..."
+            />
+          </div>
+
           <div>
             <label for="password" class="block text-sm text-gray-600 mb-2">Password</label>
             <input
@@ -72,34 +80,41 @@
             />
           </div>
 
-          <!-- Display Error Message -->
           {% if error %}
             <p class="text-red-600 text-center">{{ error }}</p>
           {% endif %}
 
-          <!-- Already have account -->
-          <div class="flex justify-between items-center">
-            <a
-              href="{% url 'login_view' %}"
-              class="text-sm text-teal-600 hover:underline"
-              >Already have an account?</a
+          <!-- выбор способа подтверждения -->
+          <div>
+            <label class="block text-sm text-gray-600 mb-2">Способ подтверждения</label>
+            <select
+              name="confirmation_method"
+              required
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm"
             >
+              <option value="">Выберите способ</option>
+              <option value="email">Подтверждение через Email</option>
+              <option value="sms">Подтверждение через SMS</option>
+            </select>
           </div>
 
-          <!-- Submit -->
+          <div class="flex justify-between items-center">
+            <label class="flex items-center text-sm text-gray-600">
+              <input type="checkbox" class="form-checkbox h-4 w-4 text-teal-600" />
+              <span class="ml-2">Remember me</span>
+            </label>
+            <a href="{% url 'login_view' %}" class="text-sm text-teal-600 hover:underline">
+              Уже есть аккаунт?
+            </a>
+          </div>
+
           <div>
             <button
               type="submit"
-              class="w-full py-3 bg-teal-600 text-white text-lg rounded-lg hover:bg-teal-700 transition"
-            >
-              Confirm
+              class="w-full py-3 bg-teal-600 text-white text-lg rounded-lg hover:bg-teal-700 transition">
+              Подтвердить
             </button>
           </div>
-          <!-- Кнопка Назад -->
-            <a href="{% url 'home' %}"
-             class="block w-full mt-2 text-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-md transition duration-300">
-            Назад
-            </a>
         </form>
       </div>
     </div>

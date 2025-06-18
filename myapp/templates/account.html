@@ -37,6 +37,15 @@
 
         <button type="submit" class="btn btn-primary mb-4">Сохранить изменения</button>
     </form>
+    <hr>
+    <div class="d-flex justify-content-between mb-5">
+    <a href="#" class="btn btn-outline-secondary">Сменить пароль</a>
+    
+    <form method="POST" action="{% url 'delete_account' %}" onsubmit="return confirm('Вы уверены, что хотите удалить аккаунт?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
+    </form>
+    </div>
 </div>
 
 <script>
