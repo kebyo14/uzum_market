@@ -214,40 +214,73 @@
     </div>
 
 
-    <h2>Update Item </h2>
-    <form method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-      <label for="name">Name:</label>
-      <input type="text" name="name" value="{{ test.name }}" required>
-      <br><br>
-  
-      <label for="description">Description:</label>
-      <input type="text" name="description" value="{{ test.description }}" required>
-      <br><br>
-  
-      <label for="price">Price:</label>
-      <input type="number" name="price" value="{{ test.price }}" required>
-      <br><br>
-  
-      <label for="image">Image:</label>
-      <input type="file" name="image" accept="image/*">
-      <br><br>
-  
-      <label for="category">Category</label>
-      <select class="form-control" id="category" name="category" required>
-        <option value="" disabled>Select a category</option>
-        {% for cat in categories %}
-          <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>
-            {{ cat.name }}
-          </option>
-        {% endfor %}
-      </select>
-      <br><br>
-  
-      <button type="submit">Update</button>
-  </form>
+    <!-- Update Form -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-8 mx-auto">
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Update Product</h3>
+              </div>
+              <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" value="{{ item.name }}" required>
+                  </div>
 
-    <a href="{% url 'product_base' %}">Back to home</a>
+                  <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" name="description" id="description" rows="4" required>{{ item.description }}</textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" class="form-control" name="price" id="price" value="{{ item.price }}" step="0.01" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Current Image</label><br>
+                    {% if item.image %}
+                      <img src="{{ item.image.url }}" alt="Current Image" width="120" class="img-thumbnail mb-2">
+                    {% else %}
+                      <p>No image uploaded</p>
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    <label for="image">Upload New Image</label>
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" name="image" id="image" accept="image/*">
+                      <label class="custom-file-label" for="image">Choose file</label>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category" name="category" required>
+                      <option value="" disabled>Select a category</option>
+                      {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Update</button>
+                  <a href="{% url 'product_base' %}" class="btn btn-secondary float-right">Back to Home</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
 
 
 
@@ -284,6 +317,12 @@
 <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <!-- AdminLTE -->
 <script src="{% static 'dist/js/adminlte.js' %}"></script>
+<script src="{% static 'plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>
+<script>
+  $(function () {
+    bsCustomFileInput.init();
+  });
+</script>
 
 <!-- OPTIONAL SCRIPTS -->
 <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
