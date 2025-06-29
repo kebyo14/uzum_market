@@ -69,3 +69,6 @@ TODO
 test.html
 ad.js
 /.cache/
+__pycache__/
+*.pyc
+db.sqlite3
