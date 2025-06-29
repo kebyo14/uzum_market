@@ -222,6 +222,7 @@
                 <th>Category</th>
                 <th>Options</th>
             </tr>
+            <a style="text-decoration: none;" href="{% url 'create_product_base' %}"><i class='bx bxs-add-to-queue' style='color:#0062ff' ></i></a>
             {% for test in product %}
             <tr align="center">
                 <td>{{ test.id }}</td>
